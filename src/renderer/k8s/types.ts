@@ -12,3 +12,7 @@ export interface ExampleKubeObjectCRD extends Renderer.K8sApi.LensExtensionKubeO
 export interface PackageKubeObjectCRD extends Renderer.K8sApi.LensExtensionKubeObjectCRD {
   title: string;
 }
+
+export interface ClusterConfigKubeObjectCRD extends Renderer.K8sApi.LensExtensionKubeObjectCRD {
+  title: string;
+}

@@ -6,10 +6,12 @@
 import { Renderer } from "@freelensapp/extensions";
 import { ExamplePreferencesStore } from "../common/store";
 import { createAvailableVersionPage } from "./components/available-version";
+import { ClusterConfigDetails } from "./details/clusterconfig-details";
 import { ExampleDetails as ExampleDetailsV1alpha1 } from "./details/example-details-v1alpha1";
 import { ExampleDetails as ExampleDetailsV1alpha2 } from "./details/example-details-v1alpha2";
 import { PackageDetails } from "./details/package-details";
-import { ExampleIcon, PackageIcon } from "./icons";
+import { ClusterConfigIcon, ExampleIcon, PackageIcon } from "./icons";
+import { ClusterConfig } from "./k8s/clusterconfig/clusterconfig-v1alpha1";
 import { Example as ExampleV1alpha1 } from "./k8s/example/example-v1alpha1";
 import { Example as ExampleV1alpha2 } from "./k8s/example/example-v1alpha2";
 import { Package } from "./k8s/package/package-v1alpha1";
@@ -21,6 +23,7 @@ import {
   ExampleActiveToggleMenuItem as ExampleActiveToggleMenuItem_v1alpha2,
   type ExampleActiveToggleMenuItemProps as ExampleActiveToggleMenuItemProps_v1alpha2,
 } from "./menus/example-active-toggle-menu-item-v1alpha2";
+import { ClusterConfigsPage } from "./pages/clusterconfigs-page";
 import { ExamplesPage as ExamplesPageV1alpha1 } from "./pages/examples-page-v1alpha1";
 import { ExamplesPage as ExamplesPageV1alpha2 } from "./pages/examples-page-v1alpha2";
 import { PackagesPage } from "./pages/packages-page";
@@ -72,6 +75,16 @@ export default class ExampleRenderer extends Renderer.LensExtension {
         ),
       },
     },
+    {
+      kind: ClusterConfig.kind,
+      apiVersions: ClusterConfig.crd.apiVersions,
+      priority: 10,
+      components: {
+        Details: (props: Renderer.Component.KubeObjectDetailsProps<any>) => (
+          <ClusterConfigDetails {...props} extension={this} />
+        ),
+      },
+    },
   ];
 
   clusterPages = [
@@ -102,6 +115,12 @@ export default class ExampleRenderer extends Renderer.LensExtension {
         Page: () => <PackagesPage extension={this} />,
       },
     },
+    {
+      id: "uds-clusterconfigs",
+      components: {
+        Page: () => <ClusterConfigsPage extension={this} />,
+      },
+    },
   ];
 
   clusterPageMenus = [
@@ -119,6 +138,14 @@ export default class ExampleRenderer extends Renderer.LensExtension {
       target: { pageId: "uds-packages" },
       components: {
         Icon: PackageIcon,
+      },
+    },
+    {
+      id: "uds-clusterconfigs",
+      title: ClusterConfig.crd.title,
+      target: { pageId: "uds-clusterconfigs" },
+      components: {
+        Icon: ClusterConfigIcon,
       },
     },
   ];

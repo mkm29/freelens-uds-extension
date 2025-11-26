@@ -10,9 +10,11 @@
 
 A Freelens extension for managing [Defense Unicorns](https://defenseunicorns.com/)
 UDS (Unicorn Delivery Service) Custom Resources. This extension provides UI
-support for viewing and managing UDS Package CRs directly within Freelens.
+support for viewing and managing UDS Package and ClusterConfig CRs directly within Freelens.
 
 ## Features
+
+### UDS Package Support
 
 - **UDS Package List View**: View all UDS Package CRs across namespaces with
   summary counts for SSO clients, network rules, and monitors
@@ -22,32 +24,52 @@ support for viewing and managing UDS Package CRs directly within Freelens.
   - Prometheus monitoring configurations (ServiceMonitor/PodMonitor)
 - **Status Tracking**: Visual indicators for Package phase (Ready, Pending, Failed)
 
+### UDS ClusterConfig Support
+
+- **ClusterConfig List View**: View all UDS ClusterConfig CRs with cluster name,
+  domain, and phase information
+- **ClusterConfig Details Panel**: Detailed view of cluster-level configurations:
+  - Attributes (cluster name, tags)
+  - Expose settings (domain, admin domain, CA certificate)
+  - Networking (Kube API CIDR, node CIDRs)
+  - Policy (namespace exemption settings)
+
 ## Requirements
 
-- Kubernetes >= 1.24
+- Kubernetes >= 1.29
 - Freelens >= 1.6.0
-- UDS Operator installed on the cluster (for actual Package CR support)
+- UDS Operator installed on the cluster (for actual `Package|Clusterconfig|Exemption` CR support)
 
 ## API Supported
 
 - `uds.dev/v1alpha1` - UDS Package Custom Resource
+- `uds.dev/v1alpha1` - UDS ClusterConfig Custom Resource
 
 ## Quick Start
 
-### Install the CRD (for testing without UDS Operator)
+### Install the CRDs (for testing without UDS Operator)
 
 ```sh
+# Install Package CRD
 kubectl apply -f examples/uds-package/crds/customresourcedefinition.yaml
+
+# Install ClusterConfig CRD
+kubectl apply -f examples/uds-clusterconfig/crds/customresourcedefinition.yaml
 ```
 
-### Create sample Package resources
+### Create sample resources
 
 ```sh
+# Create sample Package resources
 kubectl apply -f examples/uds-package/test/example.yaml
+
+# Create sample ClusterConfig resource
+kubectl apply -f examples/uds-clusterconfig/test/example.yaml
 ```
 
 This creates example Package CRs for Grafana, NeuVector, and Loki demonstrating
-SSO, network policies, and monitoring configurations.
+SSO, network policies, and monitoring configurations. It also creates an example
+ClusterConfig CR demonstrating cluster-level UDS configuration.
 
 ## Install
 
@@ -113,7 +135,7 @@ The tarball for the extension will be placed in the current directory. In
 Freelens, navigate to the Extensions list and provide the path to the tarball
 to be loaded, or drag and drop the extension tarball into the Freelens window.
 After loading for a moment, the extension should appear in the list of enabled
-extensions and "UDS Packages" will appear in the cluster sidebar.
+extensions and "UDS Packages" and "UDS Cluster Configs" will appear in the cluster sidebar.
 
 ### Check code statically
 
@@ -188,10 +210,67 @@ spec:
         app: my-app
 ```
 
+## UDS ClusterConfig CR Structure
+
+The UDS ClusterConfig CR defines cluster-level configuration for UDS deployments.
+Note: The resource requires a fixed metadata name of `uds-cluster-config`.
+
+### Attributes
+
+Identify and categorize your cluster:
+
+```yaml
+spec:
+  attributes:
+    clusterName: production-cluster
+    tags:
+      - production
+      - us-west-2
+```
+
+### Expose
+
+Configure service exposure domains:
+
+```yaml
+spec:
+  expose:
+    domain: uds.example.com
+    adminDomain: admin.uds.example.com
+    caCert: |
+      -----BEGIN CERTIFICATE-----
+      ...
+      -----END CERTIFICATE-----
+```
+
+### Networking
+
+Override automatic network discovery:
+
+```yaml
+spec:
+  networking:
+    kubeApiCIDR: "10.0.0.0/24"
+    kubeNodeCIDRs:
+      - "10.0.1.0/24"
+      - "10.0.2.0/24"
+```
+
+### Policy
+
+Configure UDS policy settings:
+
+```yaml
+spec:
+  policy:
+    allowAllNsExemptions: false
+```
+
 ## Related Resources
 
 - [UDS Documentation](https://uds.defenseunicorns.com/)
 - [UDS Package CR Reference](https://uds.defenseunicorns.com/reference/configuration/custom-resources/packages-v1alpha1-cr/)
+- [UDS ClusterConfig CR Reference](https://uds.defenseunicorns.com/reference/configuration/custom-resources/clusterconfig-v1alpha1-cr/)
 - [Freelens](https://freelens.app/)
 - [Freelens Extensions Wiki](https://github.com/freelensapp/freelens/wiki/Extensions)
 

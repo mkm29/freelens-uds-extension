@@ -1,0 +1,22 @@
+apiVersion: uds.dev/v1alpha1
+kind: UDSClusterConfig
+metadata:
+  name: uds-cluster-config
+spec:
+  attributes:
+    clusterName: "production-cluster"
+    tags:
+      - production
+      - us-west-2
+      - defense
+  expose:
+    domain: "uds.example.com"
+    adminDomain: "admin.uds.example.com"
+  networking:
+    kubeApiCIDR: "10.0.0.0/24"
+    kubeNodeCIDRs:
+      - "10.0.1.0/24"
+      - "10.0.2.0/24"
+      - "10.0.3.0/24"
+  policy:
+    allowAllNsExemptions: false
