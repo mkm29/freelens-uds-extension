@@ -10,7 +10,8 @@
 
 A Freelens extension for managing [Defense Unicorns](https://defenseunicorns.com/)
 UDS (Unicorn Delivery Service) Custom Resources. This extension provides UI
-support for viewing and managing UDS Package and ClusterConfig CRs directly within Freelens.
+support for viewing and managing UDS Package and ClusterConfig CRs directly
+within Freelens.
 
 ## Features
 
@@ -38,7 +39,8 @@ support for viewing and managing UDS Package and ClusterConfig CRs directly with
 
 - Kubernetes >= 1.29
 - Freelens >= 1.6.0
-- UDS Operator installed on the cluster (for actual `Package|Clusterconfig|Exemption` CR support)
+- UDS Operator installed on the cluster
+  (for actual `Package|Clusterconfig|Exemption` CR support)
 
 ## API Supported
 
@@ -135,7 +137,8 @@ The tarball for the extension will be placed in the current directory. In
 Freelens, navigate to the Extensions list and provide the path to the tarball
 to be loaded, or drag and drop the extension tarball into the Freelens window.
 After loading for a moment, the extension should appear in the list of enabled
-extensions and "UDS Packages" and "UDS Cluster Configs" will appear in the cluster sidebar.
+extensions and "UDS Packages" and "UDS Cluster Configs" will appear in the
+cluster sidebar.
 
 ### Check code statically
 
