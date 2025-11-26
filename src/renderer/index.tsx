@@ -8,9 +8,11 @@ import { ExamplePreferencesStore } from "../common/store";
 import { createAvailableVersionPage } from "./components/available-version";
 import { ExampleDetails as ExampleDetailsV1alpha1 } from "./details/example-details-v1alpha1";
 import { ExampleDetails as ExampleDetailsV1alpha2 } from "./details/example-details-v1alpha2";
-import { ExampleIcon } from "./icons";
+import { PackageDetails } from "./details/package-details";
+import { ExampleIcon, PackageIcon } from "./icons";
 import { Example as ExampleV1alpha1 } from "./k8s/example/example-v1alpha1";
 import { Example as ExampleV1alpha2 } from "./k8s/example/example-v1alpha2";
+import { Package } from "./k8s/package/package-v1alpha1";
 import {
   ExampleActiveToggleMenuItem as ExampleActiveToggleMenuItem_v1alpha1,
   type ExampleActiveToggleMenuItemProps as ExampleActiveToggleMenuItemProps_v1alpha1,
@@ -21,6 +23,7 @@ import {
 } from "./menus/example-active-toggle-menu-item-v1alpha2";
 import { ExamplesPage as ExamplesPageV1alpha1 } from "./pages/examples-page-v1alpha1";
 import { ExamplesPage as ExamplesPageV1alpha2 } from "./pages/examples-page-v1alpha2";
+import { PackagesPage } from "./pages/packages-page";
 import { ExamplePreferenceHint, ExamplePreferenceInput } from "./preferences/example-preference";
 
 export default class ExampleRenderer extends Renderer.LensExtension {
@@ -59,6 +62,16 @@ export default class ExampleRenderer extends Renderer.LensExtension {
         ),
       },
     },
+    {
+      kind: Package.kind,
+      apiVersions: Package.crd.apiVersions,
+      priority: 10,
+      components: {
+        Details: (props: Renderer.Component.KubeObjectDetailsProps<any>) => (
+          <PackageDetails {...props} extension={this} />
+        ),
+      },
+    },
   ];
 
   clusterPages = [
@@ -83,6 +96,12 @@ export default class ExampleRenderer extends Renderer.LensExtension {
         ]),
       },
     },
+    {
+      id: "uds-packages",
+      components: {
+        Page: () => <PackagesPage extension={this} />,
+      },
+    },
   ];
 
   clusterPageMenus = [
@@ -92,6 +111,14 @@ export default class ExampleRenderer extends Renderer.LensExtension {
       target: { pageId: "example" },
       components: {
         Icon: ExampleIcon,
+      },
+    },
+    {
+      id: "uds-packages",
+      title: Package.crd.title,
+      target: { pageId: "uds-packages" },
+      components: {
+        Icon: PackageIcon,
       },
     },
   ];

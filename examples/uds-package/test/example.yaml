@@ -1,0 +1,173 @@
+apiVersion: uds.dev/v1alpha1
+kind: Package
+metadata:
+  name: grafana
+  namespace: monitoring
+spec:
+  monitor:
+    - kind: ServiceMonitor
+      path: /metrics
+      portName: http-metrics
+      targetPort: 3000
+      selector:
+        app.kubernetes.io/name: grafana
+      description: Grafana metrics endpoint
+
+  network:
+    allow:
+      - direction: Ingress
+        selector:
+          app.kubernetes.io/name: grafana
+        remoteGenerated: IntraNamespace
+        ports:
+          - 3000
+        description: Allow intra-namespace traffic to Grafana
+      - direction: Egress
+        selector:
+          app.kubernetes.io/name: grafana
+        remoteGenerated: KubeAPI
+        description: Allow Grafana to reach Kubernetes API
+      - direction: Egress
+        selector:
+          app.kubernetes.io/name: grafana
+        remoteCidr: 0.0.0.0/0
+        port: 443
+        description: Allow Grafana to reach external HTTPS endpoints
+
+    expose:
+      - service: grafana
+        port: 3000
+        gateway: tenant
+        host: grafana
+        domain: uds.dev
+        description: Expose Grafana dashboard
+
+  sso:
+    - clientId: grafana
+      protocol: openid-connect
+      name: Grafana
+      description: Grafana SSO client for UDS
+      enabled: true
+      publicClient: false
+      redirectUris:
+        - https://grafana.uds.dev/login/generic_oauth
+      webOrigins:
+        - https://grafana.uds.dev
+      defaultClientScopes:
+        - openid
+        - profile
+        - email
+      groups:
+        - name: /UDS Core/Admin
+        - name: /UDS Core/Auditor
+      standardFlowEnabled: true
+      serviceAccountsEnabled: false
+
+status:
+  phase: Ready
+  observedGeneration: 1
+  endpoints:
+    - https://grafana.uds.dev
+  monitors:
+    - grafana-metrics
+  networkPolicies:
+    - grafana-allow-intra-namespace
+    - grafana-allow-kubeapi
+    - grafana-allow-external-https
+  ssoClients:
+    - grafana
+---
+apiVersion: uds.dev/v1alpha1
+kind: Package
+metadata:
+  name: neuvector
+  namespace: neuvector
+spec:
+  monitor:
+    - kind: ServiceMonitor
+      path: /metrics
+      portName: metrics
+      targetPort: 8181
+      selector:
+        app: neuvector-controller-pod
+      description: NeuVector controller metrics
+
+  network:
+    allow:
+      - direction: Ingress
+        selector:
+          app: neuvector-controller-pod
+        remoteGenerated: Anywhere
+        ports:
+          - 10443
+        description: Allow access to NeuVector API
+      - direction: Egress
+        selector:
+          app: neuvector-controller-pod
+        remoteGenerated: KubeAPI
+        description: Allow NeuVector to reach Kubernetes API
+
+    expose:
+      - service: neuvector-service-webui
+        port: 8443
+        gateway: admin
+        host: neuvector
+        domain: admin.uds.dev
+        description: NeuVector management console
+
+  sso:
+    - clientId: neuvector
+      protocol: openid-connect
+      name: NeuVector
+      description: NeuVector SSO integration
+      enabled: true
+      publicClient: false
+      redirectUris:
+        - https://neuvector.admin.uds.dev/openId_auth
+      groups:
+        - name: /UDS Core/Admin
+      standardFlowEnabled: true
+
+status:
+  phase: Ready
+  observedGeneration: 1
+---
+apiVersion: uds.dev/v1alpha1
+kind: Package
+metadata:
+  name: loki
+  namespace: loki
+spec:
+  monitor:
+    - kind: ServiceMonitor
+      path: /metrics
+      portName: http-metrics
+      targetPort: 3100
+      selector:
+        app.kubernetes.io/name: loki
+      description: Loki metrics
+
+  network:
+    allow:
+      - direction: Ingress
+        selector:
+          app.kubernetes.io/name: loki
+        remoteNamespace: monitoring
+        remoteSelector:
+          app.kubernetes.io/name: promtail
+        ports:
+          - 3100
+        description: Allow Promtail to push logs to Loki
+      - direction: Ingress
+        selector:
+          app.kubernetes.io/name: loki
+        remoteNamespace: monitoring
+        remoteSelector:
+          app.kubernetes.io/name: grafana
+        ports:
+          - 3100
+        description: Allow Grafana to query Loki
+
+status:
+  phase: Pending
+  observedGeneration: 1

@@ -1,0 +1,94 @@
+.section {
+  padding: 10px 0;
+  margin-bottom: 10px;
+}
+
+.table {
+  width: 100%;
+  margin-top: 8px;
+
+  .clientId {
+    flex-grow: 1.5;
+  }
+
+  .protocol {
+    flex-grow: 0.8;
+  }
+
+  .public {
+    flex-grow: 0.5;
+  }
+
+  .redirects {
+    flex-grow: 2;
+  }
+
+  .groups {
+    flex-grow: 1;
+  }
+
+  .service {
+    flex-grow: 1.5;
+  }
+
+  .port {
+    flex-grow: 0.8;
+  }
+
+  .gateway {
+    flex-grow: 1;
+  }
+
+  .host {
+    flex-grow: 1.5;
+  }
+}
+
+.empty {
+  padding: 12px;
+  color: var(--textColorSecondary);
+  font-style: italic;
+  text-align: center;
+}
+
+.rulesList,
+.monitorsList {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 8px 0;
+}
+
+.rule,
+.monitor {
+  border: 1px solid var(--borderColor);
+  border-radius: 4px;
+  padding: 12px;
+  background-color: var(--contentColor);
+}
+
+.ruleHeader,
+.monitorHeader {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.description {
+  color: var(--textColorSecondary);
+  font-size: 0.9em;
+}
+
+.ruleDetails,
+.monitorDetails {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 0.9em;
+  padding-left: 8px;
+
+  div {
+    color: var(--textColorSecondary);
+  }
+}

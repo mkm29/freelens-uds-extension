@@ -1,10 +1,10 @@
 {
-  "name": "@freelensapp/example-extension",
-  "version": "1.6.2",
-  "description": "Example of a Freelens extension",
+  "name": "@mkm29/freelens-uds-extension",
+  "version": "0.1.0",
+  "description": "UDS Freelens extension",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/freelensapp/freelens-example-extension.git",
+    "url": "git+https://github.com/mkm29/freelens-uds-extension.git",
     "directory": "."
   },
   "main": "out/main/index.js",
@@ -16,11 +16,11 @@
     "node": ">= 22.16.0",
     "freelens": "^1.6.0"
   },
-  "copyright": "© 2025 Freelens Authors",
+  "copyright": "© 2025 Defense Unicorns",
   "license": "MIT",
   "author": {
-    "name": "Freelens Authors",
-    "email": "freelens@freelens.app"
+    "name": "Mitchell Murphy",
+    "email": "mitchell.murphy@defenseunicorns.com"
   },
   "publishConfig": {
     "access": "public",
@@ -83,7 +83,9 @@
     "freelensapp",
     "lens",
     "openlens",
-    "freelens"
+    "freelens",
+    "uds",
+    "defenseunicorns"
   ],
   "packageManager": "pnpm@10.22.0"
 }
