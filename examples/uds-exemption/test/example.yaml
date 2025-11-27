@@ -1,0 +1,128 @@
+apiVersion: uds.dev/v1alpha1
+kind: Exemption
+metadata:
+  name: neuvector-exemptions
+  namespace: neuvector
+spec:
+  exemptions:
+    - title: NeuVector Controller Privileged Access
+      description: NeuVector controller requires privileged access for container runtime inspection
+      matcher:
+        kind: pod
+        name: neuvector-controller-pod.*
+        namespace: neuvector
+      policies:
+        - DisallowPrivileged
+        - DisallowHostNamespaces
+        - RestrictHostPorts
+        - DropAllCapabilities
+
+    - title: NeuVector Enforcer Host Access
+      description: NeuVector enforcer needs host network and privileged mode for traffic inspection
+      matcher:
+        kind: pod
+        name: neuvector-enforcer-pod.*
+        namespace: neuvector
+      policies:
+        - DisallowPrivileged
+        - DisallowHostNamespaces
+        - RestrictHostPorts
+        - RestrictVolumeTypes
+        - RestrictHostPathWrite
+
+status:
+  phase: Ready
+  observedGeneration: 1
+---
+apiVersion: uds.dev/v1alpha1
+kind: Exemption
+metadata:
+  name: promtail-exemptions
+  namespace: monitoring
+spec:
+  exemptions:
+    - title: Promtail Host Path Access
+      description: Promtail needs to read container logs from host paths
+      matcher:
+        kind: pod
+        name: promtail.*
+        namespace: monitoring
+      policies:
+        - RestrictVolumeTypes
+        - RestrictHostPathWrite
+
+    - title: Promtail Capabilities
+      description: Promtail requires specific capabilities for log collection
+      matcher:
+        kind: pod
+        name: promtail.*
+        namespace: monitoring
+      policies:
+        - DropAllCapabilities
+        - RestrictCapabilities
+
+status:
+  phase: Ready
+  observedGeneration: 1
+---
+apiVersion: uds.dev/v1alpha1
+kind: Exemption
+metadata:
+  name: istio-exemptions
+  namespace: istio-system
+spec:
+  exemptions:
+    - title: Istio Proxy Init Capabilities
+      description: Istio init containers need NET_ADMIN and NET_RAW for iptables rules
+      matcher:
+        kind: pod
+        name: istio-init.*
+        namespace: istio-system
+      policies:
+        - DropAllCapabilities
+        - RestrictCapabilities
+        - RequireNonRootUser
+
+    - title: Istio CNI Node Agent
+      description: Istio CNI requires privileged access for network configuration
+      matcher:
+        kind: pod
+        name: istio-cni-node.*
+        namespace: istio-system
+      policies:
+        - DisallowPrivileged
+        - DisallowHostNamespaces
+        - RestrictHostPathWrite
+
+    - title: Istio Sidecar Override
+      description: Allow Istio sidecar configuration overrides for specific workloads
+      matcher:
+        kind: pod
+        name: .*
+        namespace: istio-system
+      policies:
+        - RestrictIstioSidecarOverrides
+
+status:
+  phase: Pending
+  observedGeneration: 1
+---
+apiVersion: uds.dev/v1alpha1
+kind: Exemption
+metadata:
+  name: external-dns-exemptions
+  namespace: external-dns
+spec:
+  exemptions:
+    - title: External DNS Service ExternalName
+      description: External DNS creates ExternalName services for cloud provider endpoints
+      matcher:
+        kind: service
+        name: external-dns.*
+        namespace: external-dns
+      policies:
+        - RestrictExternalNames
+
+status:
+  phase: Ready
+  observedGeneration: 1

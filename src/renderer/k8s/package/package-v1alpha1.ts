@@ -2,10 +2,6 @@ import { Renderer } from "@freelensapp/extensions";
 
 import type { PackageKubeObjectCRD } from "../types";
 
-// ============================================================================
-// Monitor Types
-// ============================================================================
-
 export interface MonitorAuthorizationCredentials {
   name: string;
   key: string;
@@ -28,10 +24,6 @@ export interface Monitor {
   selector?: Record<string, string>;
   podSelector?: Record<string, string>;
 }
-
-// ============================================================================
-// Network Types
-// ============================================================================
 
 export type RemoteGenerated = "KubeAPI" | "KubeNodes" | "IntraNamespace" | "CloudMetadata" | "Anywhere";
 
@@ -126,10 +118,6 @@ export interface Network {
   expose?: NetworkExpose[];
 }
 
-// ============================================================================
-// SSO Types
-// ============================================================================
-
 export type SSOProtocol = "openid-connect" | "saml";
 
 export interface SSOSecret {
@@ -177,10 +165,6 @@ export interface SSO {
   alwaysDisplayInConsole?: boolean;
 }
 
-// ============================================================================
-// Package Spec and Status
-// ============================================================================
-
 export interface PackageSpec {
   monitor?: Monitor[];
   network?: Network;
@@ -201,10 +185,6 @@ export interface PackageStatus {
   networkPolicyCount?: number;
   ssoClients?: string[];
 }
-
-// ============================================================================
-// Package Class and API
-// ============================================================================
 
 export class Package extends Renderer.K8sApi.LensExtensionKubeObject<
   Renderer.K8sApi.KubeObjectMetadata,

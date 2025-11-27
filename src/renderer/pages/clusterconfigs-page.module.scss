@@ -1,0 +1,27 @@
+.page {
+  :global(.TableCell) {
+    &.domain {
+      flex-grow: 1;
+    }
+
+    &.tags {
+      flex-grow: 0.8;
+    }
+
+    &.networking {
+      flex-grow: 0.5;
+    }
+
+    &.policy {
+      flex-grow: 0.4;
+    }
+
+    &.phase {
+      flex-grow: 0.4;
+    }
+
+    &.age {
+      flex-grow: 0.3;
+    }
+  }
+}
