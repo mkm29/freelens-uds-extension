@@ -9,9 +9,9 @@ import { ClusterConfigDetails } from "./details/clusterconfig-details";
 import { ExemptionDetails } from "./details/exemption-details";
 import { PackageDetails } from "./details/package-details";
 import { ClusterConfigIcon, ExemptionIcon, PackageIcon } from "./icons";
-import { ClusterConfig } from "./k8s/clusterconfig/clusterconfig-v1alpha1";
-import { Exemption } from "./k8s/exemption/exemption-v1alpha1";
-import { Package } from "./k8s/package/package-v1alpha1";
+import { ClusterConfig, ClusterConfigApi, ClusterConfigStore } from "./k8s/clusterconfig/clusterconfig-v1alpha1";
+import { Exemption, ExemptionApi, ExemptionStore } from "./k8s/exemption/exemption-v1alpha1";
+import { Package, PackageApi, PackageStore } from "./k8s/package/package-v1alpha1";
 import { ClusterConfigMenuItem, ExemptionMenuItem, PackageMenuItem, type UDSMenuItemProps } from "./menus";
 import { ClusterConfigsPage } from "./pages/clusterconfigs-page";
 import { ExemptionsPage } from "./pages/exemptions-page";
@@ -21,6 +21,27 @@ import { ExamplePreferenceHint, ExamplePreferenceInput } from "./preferences/exa
 export default class ExampleRenderer extends Renderer.LensExtension {
   async onActivate() {
     ExamplePreferencesStore.getInstanceOrCreate().loadExtension(this);
+
+    // Register Package API and Store
+    const packageApi = new PackageApi({
+      objectConstructor: Package,
+    });
+    Renderer.K8sApi.apiManager.registerApi(packageApi);
+    Renderer.K8sApi.apiManager.registerStore(new PackageStore(packageApi));
+
+    // Register ClusterConfig API and Store
+    const clusterConfigApi = new ClusterConfigApi({
+      objectConstructor: ClusterConfig,
+    });
+    Renderer.K8sApi.apiManager.registerApi(clusterConfigApi);
+    Renderer.K8sApi.apiManager.registerStore(new ClusterConfigStore(clusterConfigApi));
+
+    // Register Exemption API and Store
+    const exemptionApi = new ExemptionApi({
+      objectConstructor: Exemption,
+    });
+    Renderer.K8sApi.apiManager.registerApi(exemptionApi);
+    Renderer.K8sApi.apiManager.registerStore(new ExemptionStore(exemptionApi));
   }
 
   appPreferences = [
