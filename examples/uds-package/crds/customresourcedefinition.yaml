@@ -1,0 +1,216 @@
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: packages.uds.dev
+spec:
+  group: uds.dev
+  names:
+    kind: Package
+    listKind: PackageList
+    plural: packages
+    singular: package
+    shortNames:
+      - pkg
+  scope: Namespaced
+  versions:
+    - name: v1alpha1
+      served: true
+      storage: true
+      schema:
+        openAPIV3Schema:
+          type: object
+          properties:
+            spec:
+              type: object
+              properties:
+                monitor:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      kind:
+                        type: string
+                        enum: [PodMonitor, ServiceMonitor]
+                      path:
+                        type: string
+                      portName:
+                        type: string
+                      targetPort:
+                        type: integer
+                      description:
+                        type: string
+                      selector:
+                        type: object
+                        additionalProperties:
+                          type: string
+                      podSelector:
+                        type: object
+                        additionalProperties:
+                          type: string
+                      authorization:
+                        type: object
+                        properties:
+                          type:
+                            type: string
+                          credentials:
+                            type: object
+                            properties:
+                              name:
+                                type: string
+                              key:
+                                type: string
+                              optional:
+                                type: boolean
+                network:
+                  type: object
+                  properties:
+                    allow:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          direction:
+                            type: string
+                            enum: [Ingress, Egress]
+                          ports:
+                            type: array
+                            items:
+                              type: integer
+                          port:
+                            type: integer
+                          selector:
+                            type: object
+                            additionalProperties:
+                              type: string
+                          remoteSelector:
+                            type: object
+                            additionalProperties:
+                              type: string
+                          remoteNamespace:
+                            type: string
+                          remoteServiceAccount:
+                            type: string
+                          remoteGenerated:
+                            type: string
+                            enum: [KubeAPI, KubeNodes, IntraNamespace, CloudMetadata, Anywhere]
+                          remoteCidr:
+                            type: string
+                          remoteHost:
+                            type: string
+                          description:
+                            type: string
+                    expose:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          service:
+                            type: string
+                          port:
+                            type: integer
+                          gateway:
+                            type: string
+                          host:
+                            type: string
+                          domain:
+                            type: string
+                          description:
+                            type: string
+                          advancedHTTP:
+                            type: object
+                            properties:
+                              timeout:
+                                type: string
+                              weight:
+                                type: integer
+                sso:
+                  type: array
+                  items:
+                    type: object
+                    required:
+                      - clientId
+                    properties:
+                      clientId:
+                        type: string
+                      protocol:
+                        type: string
+                        enum: [openid-connect, saml]
+                      name:
+                        type: string
+                      description:
+                        type: string
+                      enabled:
+                        type: boolean
+                      publicClient:
+                        type: boolean
+                      redirectUris:
+                        type: array
+                        items:
+                          type: string
+                      webOrigins:
+                        type: array
+                        items:
+                          type: string
+                      baseUrl:
+                        type: string
+                      rootUrl:
+                        type: string
+                      adminUrl:
+                        type: string
+                      defaultClientScopes:
+                        type: array
+                        items:
+                          type: string
+                      secret:
+                        type: string
+                      secretName:
+                        type: string
+                      groups:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            name:
+                              type: string
+                            path:
+                              type: string
+                      serviceAccountsEnabled:
+                        type: boolean
+                      standardFlowEnabled:
+                        type: boolean
+            status:
+              type: object
+              properties:
+                observedGeneration:
+                  type: integer
+                phase:
+                  type: string
+                endpoints:
+                  type: array
+                  items:
+                    type: string
+                monitors:
+                  type: array
+                  items:
+                    type: string
+                networkPolicies:
+                  type: array
+                  items:
+                    type: string
+                ssoClients:
+                  type: array
+                  items:
+                    type: string
+      subresources:
+        status: {}
+      additionalPrinterColumns:
+        - name: Phase
+          type: string
+          jsonPath: .status.phase
+        - name: SSO Clients
+          type: integer
+          jsonPath: .spec.sso
+          priority: 1
+        - name: Age
+          type: date
+          jsonPath: .metadata.creationTimestamp

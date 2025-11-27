@@ -5,6 +5,14 @@ export interface NamespacedObjectReference {
   namespace?: string;
 }
 
-export interface ExampleKubeObjectCRD extends Renderer.K8sApi.LensExtensionKubeObjectCRD {
+export interface PackageKubeObjectCRD extends Renderer.K8sApi.LensExtensionKubeObjectCRD {
+  title: string;
+}
+
+export interface ClusterConfigKubeObjectCRD extends Renderer.K8sApi.LensExtensionKubeObjectCRD {
+  title: string;
+}
+
+export interface ExemptionKubeObjectCRD extends Renderer.K8sApi.LensExtensionKubeObjectCRD {
   title: string;
 }

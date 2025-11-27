@@ -1,0 +1,24 @@
+declare const classNames: {
+  readonly section: "section";
+  readonly table: "table";
+  readonly clientId: "clientId";
+  readonly protocol: "protocol";
+  readonly public: "public";
+  readonly redirects: "redirects";
+  readonly groups: "groups";
+  readonly service: "service";
+  readonly port: "port";
+  readonly gateway: "gateway";
+  readonly host: "host";
+  readonly empty: "empty";
+  readonly rulesList: "rulesList";
+  readonly monitorsList: "monitorsList";
+  readonly rule: "rule";
+  readonly monitor: "monitor";
+  readonly ruleHeader: "ruleHeader";
+  readonly monitorHeader: "monitorHeader";
+  readonly description: "description";
+  readonly ruleDetails: "ruleDetails";
+  readonly monitorDetails: "monitorDetails";
+};
+export = classNames;
