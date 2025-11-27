@@ -1,6 +1,6 @@
 import { Renderer } from "@freelensapp/extensions";
 
-import type { ClusterConfigKubeObjectCRD } from "../types";
+import type { UDSKubeObject } from "../types";
 
 export interface ClusterConfigAttributes {
   clusterName?: string;
@@ -43,7 +43,7 @@ export class ClusterConfig extends Renderer.K8sApi.LensExtensionKubeObject<
   static readonly namespaced = false;
   static readonly apiBase = "/apis/uds.dev/v1alpha1/clusterconfig";
 
-  static readonly crd: ClusterConfigKubeObjectCRD = {
+  static readonly crd: UDSKubeObject = {
     apiVersions: ["uds.dev/v1alpha1"],
     plural: "clusterconfig",
     singular: "clusterconfig",

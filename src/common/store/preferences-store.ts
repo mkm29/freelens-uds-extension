@@ -1,35 +1,30 @@
 import { Common } from "@freelensapp/extensions";
 import { makeObservable, observable } from "mobx";
 
-export interface ExamplePreferencesModel {
+export interface UDSPreferencesModel {
   enabled: boolean;
 }
 
-export class ExamplePreferencesStore extends Common.Store.ExtensionStore<ExamplePreferencesModel> {
+export class UDSPreferencesStore extends Common.Store.ExtensionStore<UDSPreferencesModel> {
   @observable accessor enabled = false;
 
   constructor() {
     super({
-      configName: "example-preferences-store",
+      configName: "uds-preferences-store",
       defaults: {
         enabled: false,
       },
     });
-    console.log("[EXAMPLE-PREFERENCES-STORE] constructor");
     makeObservable(this);
   }
 
-  fromStore({ enabled }: ExamplePreferencesModel): void {
-    console.log(`[EXAMPLE-PREFERENCES-STORE] set ${enabled}`);
-
+  fromStore({ enabled }: UDSPreferencesModel): void {
     this.enabled = enabled;
   }
 
-  toJSON(): ExamplePreferencesModel {
-    const enabled = this.enabled;
-    console.log(`[EXAMPLE-PREFERENCES-STORE] get ${enabled}`);
+  toJSON(): UDSPreferencesModel {
     return {
-      enabled,
+      enabled: this.enabled,
     };
   }
 }

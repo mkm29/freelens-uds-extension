@@ -1,6 +1,6 @@
 import { Renderer } from "@freelensapp/extensions";
 
-import type { PackageKubeObjectCRD } from "../types";
+import type { UDSKubeObject } from "../types";
 
 export interface MonitorAuthorizationCredentials {
   name: string;
@@ -195,7 +195,7 @@ export class Package extends Renderer.K8sApi.LensExtensionKubeObject<
   static readonly namespaced = true;
   static readonly apiBase = "/apis/uds.dev/v1alpha1/packages";
 
-  static readonly crd: PackageKubeObjectCRD = {
+  static readonly crd: UDSKubeObject = {
     apiVersions: ["uds.dev/v1alpha1"],
     plural: "packages",
     singular: "package",

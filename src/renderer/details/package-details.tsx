@@ -1,5 +1,6 @@
 import { Renderer } from "@freelensapp/extensions";
 import { observer } from "mobx-react";
+import { useEffect, useState } from "react";
 import { withErrorPage } from "../components/error-page";
 import styles from "./package-details.module.scss";
 import stylesInline from "./package-details.module.scss?inline";
@@ -15,15 +16,63 @@ import type {
 
 const {
   Component: { Badge, DrawerItem, SubTitle, Table, TableCell, TableHead, TableRow },
+  Navigation,
 } = Renderer;
 
 export interface PackageDetailsProps extends Renderer.Component.KubeObjectDetailsProps<Package> {
   extension: Renderer.LensExtension;
 }
 
+interface NetworkPolicyInfo {
+  name: string;
+  namespace: string;
+}
+
 export const PackageDetails = observer((props: PackageDetailsProps) =>
   withErrorPage(props, () => {
     const { object } = props;
+    const [networkPolicies, setNetworkPolicies] = useState<NetworkPolicyInfo[]>([]);
+    const [loadingPolicies, setLoadingPolicies] = useState(true);
+
+    // Fetch NetworkPolicies in the Package's namespace that belong to this Package (via uds/package label)
+    useEffect(() => {
+      const fetchNetworkPolicies = async () => {
+        try {
+          const namespace = object.getNs();
+          const packageName = object.getName();
+
+          // Use the apiManager to get or create a NetworkPolicy API instance
+          // The apiBase for NetworkPolicies follows the standard K8s API pattern
+          const networkPolicyApi = new Renderer.K8sApi.KubeApi({
+            objectConstructor: Renderer.K8sApi.KubeObject,
+            apiBase: "/apis/networking.k8s.io/v1/networkpolicies",
+            kind: "NetworkPolicy",
+            checkPreferredVersion: true,
+          });
+
+          // List NetworkPolicies with label selector
+          const labelSelector = `uds/package=${packageName}`;
+          const allPolicies = await networkPolicyApi.list({ namespace }, { labelSelector });
+
+          if (allPolicies) {
+            setNetworkPolicies(
+              allPolicies.map((p: any) => ({
+                // KubeObject uses getName() and getNs() methods
+                name: typeof p.getName === "function" ? p.getName() : p.metadata?.name || "",
+                namespace: typeof p.getNs === "function" ? p.getNs() : p.metadata?.namespace || namespace,
+              })),
+            );
+          }
+        } catch (error) {
+          // If we can't fetch policies, we'll just show the count from status
+          console.warn("Could not fetch NetworkPolicies:", error);
+        } finally {
+          setLoadingPolicies(false);
+        }
+      };
+
+      fetchNetworkPolicies();
+    }, [object]);
 
     const renderSelector = (selector?: { [key: string]: string }) => {
       if (!selector || Object.keys(selector).length === 0) return "None";
@@ -154,6 +203,47 @@ export const PackageDetails = observer((props: PackageDetailsProps) =>
       );
     };
 
+    const renderNetworkPolicies = () => {
+      const policyCount = object.status?.networkPolicyCount || 0;
+
+      if (loadingPolicies) {
+        return <div className={styles.empty}>Loading network policies...</div>;
+      }
+
+      if (networkPolicies.length === 0) {
+        if (policyCount > 0) {
+          // We have a count but couldn't fetch the policies - show count only
+          return <div className={styles.empty}>{policyCount} network policies created (names not available)</div>;
+        }
+        return <div className={styles.empty}>No network policies created</div>;
+      }
+
+      return (
+        <div className={styles.networkPoliciesList}>
+          {networkPolicies.map((policy, idx) => (
+            <div key={idx} className={styles.networkPolicyItem}>
+              <div className={styles.networkPolicyHeader}>
+                <Badge label="NetworkPolicy" />
+                <a
+                  href="#"
+                  className={styles.networkPolicyName}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    // Navigate to the Network Policies page with the specific policy's details open
+                    // The selfLink format for NetworkPolicies is: /apis/networking.k8s.io/v1/namespaces/{ns}/networkpolicies/{name}
+                    const selfLink = `/apis/networking.k8s.io/v1/namespaces/${policy.namespace}/networkpolicies/${policy.name}`;
+                    Navigation.navigate(`/network-policies?kubeDetails=${encodeURIComponent(selfLink)}`);
+                  }}
+                >
+                  {policy.name || `[unnamed-${idx}]`}
+                </a>
+              </div>
+            </div>
+          ))}
+        </div>
+      );
+    };
+
     return (
       <>
         <style>{stylesInline}</style>
@@ -164,9 +254,9 @@ export const PackageDetails = observer((props: PackageDetailsProps) =>
         {object.status?.observedGeneration && (
           <DrawerItem name="Observed Generation">{object.status.observedGeneration}</DrawerItem>
         )}
-        {object.status?.networkPolicyCount !== undefined && (
-          <DrawerItem name="Network Policies">{object.status.networkPolicyCount}</DrawerItem>
-        )}
+
+        <SubTitle title={`Network Policies (${loadingPolicies ? "..." : networkPolicies.length})`} />
+        <div className={styles.section}>{renderNetworkPolicies()}</div>
 
         <SubTitle title={`SSO Clients (${object.spec.sso?.length || 0})`} />
         <div className={styles.section}>{renderSSOClients(object.spec.sso)}</div>

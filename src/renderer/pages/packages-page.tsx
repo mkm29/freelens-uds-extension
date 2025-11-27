@@ -1,5 +1,6 @@
 import { Renderer } from "@freelensapp/extensions";
 import { observer } from "mobx-react";
+import { getPhaseColor } from "../../common/utils";
 import { withErrorPage } from "../components/error-page";
 import { Package, type PackageApi } from "../k8s/package/package-v1alpha1";
 import styles from "./packages-page.module.scss";
@@ -40,19 +41,6 @@ export interface PackagesPageProps {
 export const PackagesPage = observer((props: PackagesPageProps) =>
   withErrorPage(props, () => {
     const store = KubeObject.getStore<KubeObject>();
-
-    const getPhaseColor = (phase: string): string => {
-      switch (phase.toLowerCase()) {
-        case "ready":
-          return "success";
-        case "pending":
-          return "warning";
-        case "failed":
-          return "error";
-        default:
-          return "default";
-      }
-    };
 
     return (
       <>

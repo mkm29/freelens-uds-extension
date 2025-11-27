@@ -1,5 +1,6 @@
 import { Renderer } from "@freelensapp/extensions";
 import { observer } from "mobx-react";
+import { getPhaseColor } from "../../common/utils";
 import { withErrorPage } from "../components/error-page";
 import { Exemption, type ExemptionApi } from "../k8s/exemption/exemption-v1alpha1";
 import styles from "./exemptions-page.module.scss";
@@ -38,19 +39,6 @@ export interface ExemptionsPageProps {
 export const ExemptionsPage = observer((props: ExemptionsPageProps) =>
   withErrorPage(props, () => {
     const store = KubeObject.getStore<KubeObject>();
-
-    const getPhaseColor = (phase: string): string => {
-      switch (phase.toLowerCase()) {
-        case "ready":
-          return "success";
-        case "pending":
-          return "warning";
-        case "failed":
-          return "error";
-        default:
-          return "default";
-      }
-    };
 
     return (
       <>
