@@ -1,6 +1,6 @@
 import { Renderer } from "@freelensapp/extensions";
 
-import type { ExemptionKubeObjectCRD } from "../types";
+import type { UDSKubeObject } from "../types";
 
 export type ExemptionPolicy =
   | "DisallowHostNamespaces"
@@ -55,7 +55,7 @@ export class Exemption extends Renderer.K8sApi.LensExtensionKubeObject<
   static readonly namespaced = true;
   static readonly apiBase = "/apis/uds.dev/v1alpha1/exemptions";
 
-  static readonly crd: ExemptionKubeObjectCRD = {
+  static readonly crd: UDSKubeObject = {
     apiVersions: ["uds.dev/v1alpha1"],
     plural: "exemptions",
     singular: "exemption",

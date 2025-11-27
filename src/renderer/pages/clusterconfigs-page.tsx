@@ -1,5 +1,6 @@
 import { Renderer } from "@freelensapp/extensions";
 import { observer } from "mobx-react";
+import { getPhaseColor } from "../../common/utils";
 import { withErrorPage } from "../components/error-page";
 import { ClusterConfig, type ClusterConfigApi } from "../k8s/clusterconfig/clusterconfig-v1alpha1";
 import styles from "./clusterconfigs-page.module.scss";
@@ -36,19 +37,6 @@ export interface ClusterConfigsPageProps {
 export const ClusterConfigsPage = observer((props: ClusterConfigsPageProps) =>
   withErrorPage(props, () => {
     const store = KubeObject.getStore<KubeObject>();
-
-    const getPhaseColor = (phase: string): string => {
-      switch (phase.toLowerCase()) {
-        case "ready":
-          return "success";
-        case "pending":
-          return "warning";
-        case "failed":
-          return "error";
-        default:
-          return "default";
-      }
-    };
 
     return (
       <>

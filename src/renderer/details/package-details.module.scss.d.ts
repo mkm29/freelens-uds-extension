@@ -13,10 +13,14 @@ declare const classNames: {
   readonly empty: "empty";
   readonly rulesList: "rulesList";
   readonly monitorsList: "monitorsList";
+  readonly networkPoliciesList: "networkPoliciesList";
   readonly rule: "rule";
   readonly monitor: "monitor";
+  readonly networkPolicyItem: "networkPolicyItem";
   readonly ruleHeader: "ruleHeader";
   readonly monitorHeader: "monitorHeader";
+  readonly networkPolicyHeader: "networkPolicyHeader";
+  readonly networkPolicyName: "networkPolicyName";
   readonly description: "description";
   readonly ruleDetails: "ruleDetails";
   readonly monitorDetails: "monitorDetails";

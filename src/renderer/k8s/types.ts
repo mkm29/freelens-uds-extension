@@ -5,14 +5,10 @@ export interface NamespacedObjectReference {
   namespace?: string;
 }
 
-export interface PackageKubeObjectCRD extends Renderer.K8sApi.LensExtensionKubeObjectCRD {
-  title: string;
-}
-
-export interface ClusterConfigKubeObjectCRD extends Renderer.K8sApi.LensExtensionKubeObjectCRD {
-  title: string;
-}
-
-export interface ExemptionKubeObjectCRD extends Renderer.K8sApi.LensExtensionKubeObjectCRD {
+/**
+ * Unified CRD interface for all UDS custom resources.
+ * Extends the base LensExtensionKubeObjectCRD with a title field.
+ */
+export interface UDSKubeObject extends Renderer.K8sApi.LensExtensionKubeObjectCRD {
   title: string;
 }

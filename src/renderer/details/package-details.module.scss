@@ -52,7 +52,8 @@
 }
 
 .rulesList,
-.monitorsList {
+.monitorsList,
+.networkPoliciesList {
   display: flex;
   flex-direction: column;
   gap: 12px;
@@ -60,19 +61,48 @@
 }
 
 .rule,
-.monitor {
+.monitor,
+.networkPolicyItem {
   border: 1px solid var(--borderColor);
   border-radius: 4px;
   padding: 12px;
   background-color: var(--contentColor);
+
+  &:hover {
+    background-color: var(--layoutTabsActiveColor);
+    border-color: var(--primary);
+  }
 }
 
 .ruleHeader,
-.monitorHeader {
+.monitorHeader,
+.networkPolicyHeader {
   display: flex;
   align-items: center;
   gap: 8px;
-  margin-bottom: 8px;
+  margin-bottom: 0;
+
+  a {
+    color: var(--textColorPrimary);
+    text-decoration: none;
+
+    &:hover {
+      color: var(--primary);
+      text-decoration: underline;
+    }
+  }
+}
+
+.networkPolicyName {
+  color: var(--textColorPrimary);
+  font-weight: 500;
+  cursor: pointer;
+  text-decoration: none;
+
+  &:hover {
+    color: var(--primary);
+    text-decoration: underline;
+  }
 }
 
 .description {

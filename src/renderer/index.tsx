@@ -4,11 +4,11 @@
  */
 
 import { Renderer } from "@freelensapp/extensions";
-import { ExamplePreferencesStore } from "../common/store";
+import { UDSPreferencesStore } from "../common/store";
 import { ClusterConfigDetails } from "./details/clusterconfig-details";
 import { ExemptionDetails } from "./details/exemption-details";
 import { PackageDetails } from "./details/package-details";
-import { ClusterConfigIcon, ExemptionIcon, PackageIcon } from "./icons";
+import { ClusterConfigIcon, ExemptionIcon, PackageIcon, UDSManagementIcon } from "./icons";
 import { ClusterConfig, ClusterConfigApi, ClusterConfigStore } from "./k8s/clusterconfig/clusterconfig-v1alpha1";
 import { Exemption, ExemptionApi, ExemptionStore } from "./k8s/exemption/exemption-v1alpha1";
 import { Package, PackageApi, PackageStore } from "./k8s/package/package-v1alpha1";
@@ -16,11 +16,11 @@ import { ClusterConfigMenuItem, ExemptionMenuItem, PackageMenuItem, type UDSMenu
 import { ClusterConfigsPage } from "./pages/clusterconfigs-page";
 import { ExemptionsPage } from "./pages/exemptions-page";
 import { PackagesPage } from "./pages/packages-page";
-import { ExamplePreferenceHint, ExamplePreferenceInput } from "./preferences/example-preference";
+import { UDSPreferenceHint, UDSPreferenceInput } from "./preferences/uds-preference";
 
-export default class ExampleRenderer extends Renderer.LensExtension {
+export default class UDSRenderer extends Renderer.LensExtension {
   async onActivate() {
-    ExamplePreferencesStore.getInstanceOrCreate().loadExtension(this);
+    UDSPreferencesStore.getInstanceOrCreate().loadExtension(this);
 
     // Register Package API and Store
     const packageApi = new PackageApi({
@@ -46,10 +46,10 @@ export default class ExampleRenderer extends Renderer.LensExtension {
 
   appPreferences = [
     {
-      title: "Example Preferences",
+      title: "UDS Preferences",
       components: {
-        Input: () => <ExamplePreferenceInput />,
-        Hint: () => <ExamplePreferenceHint />,
+        Input: () => <UDSPreferenceInput />,
+        Hint: () => <UDSPreferenceHint />,
       },
     },
   ];
@@ -110,7 +110,15 @@ export default class ExampleRenderer extends Renderer.LensExtension {
 
   clusterPageMenus = [
     {
+      id: "uds-management",
+      title: "UDS Management",
+      components: {
+        Icon: UDSManagementIcon,
+      },
+    },
+    {
       id: "uds-packages",
+      parentId: "uds-management",
       title: Package.crd.title,
       target: { pageId: "uds-packages" },
       components: {
@@ -119,6 +127,7 @@ export default class ExampleRenderer extends Renderer.LensExtension {
     },
     {
       id: "uds-clusterconfigs",
+      parentId: "uds-management",
       title: ClusterConfig.crd.title,
       target: { pageId: "uds-clusterconfigs" },
       components: {
@@ -127,6 +136,7 @@ export default class ExampleRenderer extends Renderer.LensExtension {
     },
     {
       id: "uds-exemptions",
+      parentId: "uds-management",
       title: Exemption.crd.title,
       target: { pageId: "uds-exemptions" },
       components: {
