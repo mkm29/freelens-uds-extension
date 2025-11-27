@@ -15,13 +15,24 @@ directly within Freelens.
 
 ## Features
 
+### Unified Navigation
+
+All UDS resources are organized under a single **"UDS Management"** menu in the
+cluster sidebar, providing quick access to:
+
+- UDS Packages
+- UDS Cluster Configs
+- UDS Exemptions
+
 ### UDS Package Support
 
 - **UDS Package List View**: View all UDS Package CRs across namespaces with
   summary counts for SSO clients, network rules, and monitors
 - **Package Details Panel**: Detailed view of Package configurations including:
   - SSO client configurations (Keycloak integration)
-  - Network policies (allow/expose rules)
+  - Network policies (allow/expose rules) with clickable links to Freelens
+    built-in Network Policies view
+  - Generated NetworkPolicies list with direct navigation to each policy
   - Prometheus monitoring configurations (ServiceMonitor/PodMonitor)
 - **Status Tracking**: Visual indicators for Package phase (Ready, Pending, Failed)
 
@@ -156,8 +167,8 @@ The tarball for the extension will be placed in the current directory. In
 Freelens, navigate to the Extensions list and provide the path to the tarball
 to be loaded, or drag and drop the extension tarball into the Freelens window.
 After loading for a moment, the extension should appear in the list of enabled
-extensions and "UDS Packages", "UDS Cluster Configs", and "UDS Exemptions" will
-appear in the cluster sidebar.
+extensions and a "UDS Management" menu will appear in the cluster sidebar with
+sub-items for Packages, Cluster Configs, and Exemptions.
 
 ### Check code statically
 
