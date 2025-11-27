@@ -24,8 +24,79 @@ export function getPhaseColor(phase: string): string {
 }
 
 /**
+ * Copies text content to the system clipboard.
+ * @param text - The text to copy to clipboard
+ * @returns A promise that resolves when the copy operation completes
+ */
+export const copyToClipboard = async (text: string): Promise<void> => {
+  await navigator.clipboard.writeText(text);
+};
+
+/**
+ * Creates an event handler that copies a YAML manifest to clipboard.
+ * Prevents event propagation to avoid triggering parent element handlers.
+ *
+ * @param manifest - The object to convert to YAML and copy
+ * @returns An async event handler function for React onClick
+ *
+ * @example
+ * ```tsx
+ * const handleCopyYaml = createYamlCopyHandler({
+ *   apiVersion: "uds.dev/v1alpha1",
+ *   kind: "Package",
+ *   metadata: { name: "my-package" },
+ *   spec: { ... }
+ * });
+ *
+ * <MenuItem onClick={handleCopyYaml}>Copy YAML</MenuItem>
+ * ```
+ */
+export const createYamlCopyHandler =
+  (manifest: Record<string, unknown>) =>
+  async (event: React.MouseEvent): Promise<void> => {
+    event.stopPropagation();
+    await copyToClipboard(jsonToYaml(manifest));
+  };
+
+/**
  * Converts a JavaScript object to YAML format.
- * Used for generating YAML manifests for clipboard copy operations.
+ *
+ * This function handles the conversion of JavaScript objects to valid YAML strings,
+ * with proper indentation and formatting. It supports:
+ * - Primitive types (strings, numbers, booleans, null)
+ * - Arrays (with proper dash notation for list items)
+ * - Nested objects (with proper indentation)
+ * - Special string handling (quotes strings containing special characters)
+ *
+ * @param obj - The JavaScript object to convert to YAML
+ * @param indent - The current indentation level (default: 0, used internally for recursion)
+ * @returns A YAML-formatted string representation of the object
+ *
+ * @remarks
+ * - Strings containing special characters (`:`, `#`, newlines) are JSON-quoted
+ * - Strings that look like YAML reserved words (true, false, yes, no, null) are quoted
+ * - Strings that look like numbers are quoted to preserve string type
+ * - Empty arrays are rendered as `[]` and empty objects as `{}`
+ * - `undefined` values in objects are filtered out (not included in output)
+ *
+ * @example
+ * ```ts
+ * const obj = {
+ *   apiVersion: "v1",
+ *   kind: "Pod",
+ *   metadata: { name: "my-pod" },
+ *   spec: { containers: [{ name: "app", image: "nginx" }] }
+ * };
+ * console.log(jsonToYaml(obj));
+ * // apiVersion: v1
+ * // kind: Pod
+ * // metadata:
+ * //   name: my-pod
+ * // spec:
+ * //   containers:
+ * //   - name: app
+ * //     image: nginx
+ * ```
  */
 export function jsonToYaml(obj: unknown, indent = 0): string {
   const spaces = "  ".repeat(indent);

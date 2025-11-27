@@ -1,5 +1,5 @@
 import { Renderer } from "@freelensapp/extensions";
-import { jsonToYaml } from "../../common/utils";
+import { copyToClipboard, createYamlCopyHandler } from "../../common/utils";
 import { Package } from "../k8s/package/package-v1alpha1";
 
 import type { ClusterConfig } from "../k8s/clusterconfig/clusterconfig-v1alpha1";
@@ -14,11 +14,6 @@ export interface UDSMenuItemProps<T extends Renderer.K8sApi.KubeObject>
   extends Renderer.Component.KubeObjectMenuProps<T> {
   extension: Renderer.LensExtension;
 }
-
-// Clipboard helper
-const copyToClipboard = async (text: string): Promise<void> => {
-  await navigator.clipboard.writeText(text);
-};
 
 // Open URL helper
 const openUrl = (url: string): void => {
@@ -65,16 +60,12 @@ export const PackageMenuItem = (props: UDSMenuItemProps<Package>) => {
   const ssoClients = Package.getSSOClients(object);
   const hasSSOClients = ssoClients.length > 0;
 
-  const handleCopyYaml = async (event: React.MouseEvent) => {
-    event.stopPropagation();
-    const manifest = {
-      apiVersion: "uds.dev/v1alpha1",
-      kind: "Package",
-      metadata: buildMetadata(object),
-      spec: object.spec,
-    };
-    await copyToClipboard(jsonToYaml(manifest));
-  };
+  const handleCopyYaml = createYamlCopyHandler({
+    apiVersion: "uds.dev/v1alpha1",
+    kind: "Package",
+    metadata: buildMetadata(object),
+    spec: object.spec,
+  });
 
   return (
     <>
@@ -134,16 +125,12 @@ export const ClusterConfigMenuItem = (props: UDSMenuItemProps<ClusterConfig>) =>
   const domain = object.spec?.expose?.domain;
   const adminDomain = object.spec?.expose?.adminDomain;
 
-  const handleCopyYaml = async (event: React.MouseEvent) => {
-    event.stopPropagation();
-    const manifest = {
-      apiVersion: "uds.dev/v1alpha1",
-      kind: "ClusterConfig",
-      metadata: buildMetadata(object, false),
-      spec: object.spec,
-    };
-    await copyToClipboard(jsonToYaml(manifest));
-  };
+  const handleCopyYaml = createYamlCopyHandler({
+    apiVersion: "uds.dev/v1alpha1",
+    kind: "ClusterConfig",
+    metadata: buildMetadata(object, false),
+    spec: object.spec,
+  });
 
   const handleCopyDomain = async (event: React.MouseEvent, domainValue: string) => {
     event.stopPropagation();
@@ -187,16 +174,12 @@ export const ExemptionMenuItem = (props: UDSMenuItemProps<Exemption>) => {
   const policies = new Set<string>();
   exemptions.forEach((e) => e.policies?.forEach((p) => policies.add(p)));
 
-  const handleCopyYaml = async (event: React.MouseEvent) => {
-    event.stopPropagation();
-    const manifest = {
-      apiVersion: "uds.dev/v1alpha1",
-      kind: "Exemption",
-      metadata: buildMetadata(object),
-      spec: object.spec,
-    };
-    await copyToClipboard(jsonToYaml(manifest));
-  };
+  const handleCopyYaml = createYamlCopyHandler({
+    apiVersion: "uds.dev/v1alpha1",
+    kind: "Exemption",
+    metadata: buildMetadata(object),
+    spec: object.spec,
+  });
 
   const handleCopyPolicies = async (event: React.MouseEvent) => {
     event.stopPropagation();

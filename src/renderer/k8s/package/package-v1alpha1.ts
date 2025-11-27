@@ -200,7 +200,7 @@ export class Package extends Renderer.K8sApi.LensExtensionKubeObject<
     plural: "packages",
     singular: "package",
     shortNames: ["pkg"],
-    title: "UDS Packages",
+    title: "Packages",
   };
 
   // Monitor Helper Methods
