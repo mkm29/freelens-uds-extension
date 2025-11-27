@@ -1,63 +1,57 @@
 apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
+  creationTimestamp: "2025-11-25T14:43:14Z"
+  generation: 1
   name: exemptions.uds.dev
+  resourceVersion: "1126"
+  uid: 6173bf74-ae4c-4336-a7de-23bc3eb8f1a3
 spec:
+  conversion:
+    strategy: None
   group: uds.dev
   names:
     kind: Exemption
     listKind: ExemptionList
     plural: exemptions
-    singular: exemption
     shortNames:
       - exempt
+    singular: exemption
   scope: Namespaced
   versions:
     - name: v1alpha1
-      served: true
-      storage: true
       schema:
         openAPIV3Schema:
-          type: object
           properties:
             spec:
-              type: object
               properties:
                 exemptions:
-                  type: array
                   description: Policy exemptions
                   items:
-                    type: object
-                    required:
-                      - matcher
-                      - policies
                     properties:
-                      title:
-                        type: string
-                        description: Title to give the exemption for reporting purposes
                       description:
-                        type: string
                         description: Reasons as to why this exemption is needed
+                        type: string
                       matcher:
-                        type: object
                         description: Resource to exempt (Regex allowed for name)
-                        required:
-                          - kind
-                          - name
-                          - namespace
                         properties:
                           kind:
+                            default: pod
+                            enum:
+                              - pod
+                              - service
                             type: string
-                            enum: [pod, service]
                           name:
                             type: string
                           namespace:
                             type: string
+                        required:
+                          - namespace
+                          - name
+                        type: object
                       policies:
-                        type: array
-                        description: List of policies to override
+                        description: A list of policies to override
                         items:
-                          type: string
                           enum:
                             - DisallowHostNamespaces
                             - DisallowNodePortServices
@@ -77,23 +71,41 @@ spec:
                             - RestrictSeccomp
                             - RestrictSELinuxType
                             - RestrictVolumeTypes
-            status:
+                          type: string
+                        type: array
+                      title:
+                        description: title to give the exemption for reporting purposes
+                        type: string
+                    required:
+                      - policies
+                      - matcher
+                    type: object
+                  minItems: 1
+                  type: array
+              required:
+                - exemptions
               type: object
-              properties:
-                observedGeneration:
-                  type: integer
-                phase:
-                  type: string
-      subresources:
-        status: {}
-      additionalPrinterColumns:
-        - name: Phase
-          type: string
-          jsonPath: .status.phase
-        - name: Exemptions
-          type: integer
-          jsonPath: .spec.exemptions
-          priority: 1
-        - name: Age
-          type: date
-          jsonPath: .metadata.creationTimestamp
+          type: object
+      served: true
+      storage: true
+status:
+  acceptedNames:
+    kind: Exemption
+    listKind: ExemptionList
+    plural: exemptions
+    shortNames:
+      - exempt
+    singular: exemption
+  conditions:
+    - lastTransitionTime: "2025-11-25T14:43:14Z"
+      message: no conflicts found
+      reason: NoConflicts
+      status: "True"
+      type: NamesAccepted
+    - lastTransitionTime: "2025-11-25T14:43:14Z"
+      message: the initial names have been accepted
+      reason: InitialNamesAccepted
+      status: "True"
+      type: Established
+  storedVersions:
+    - v1alpha1
