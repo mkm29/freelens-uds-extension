@@ -48,7 +48,7 @@ export class ClusterConfig extends Renderer.K8sApi.LensExtensionKubeObject<
     plural: "clusterconfig",
     singular: "clusterconfig",
     shortNames: ["cc"],
-    title: "UDS Cluster Configs",
+    title: "Cluster Configs",
   };
 
   // Attributes Helper Methods

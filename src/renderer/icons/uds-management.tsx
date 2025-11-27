@@ -1,5 +1,5 @@
 import { Renderer } from "@freelensapp/extensions";
-import svgIcon from "./uds-management.svg?raw";
+import svgIcon from "./doug.svg?raw";
 
 const {
   Component: { Icon },

@@ -1,4 +1,4 @@
-import { Renderer } from "@freelensapp/extensions";
+import { Common, Renderer } from "@freelensapp/extensions";
 import { observer } from "mobx-react";
 import { useEffect, useState } from "react";
 import { withErrorPage } from "../components/error-page";
@@ -33,12 +33,22 @@ export const PackageDetails = observer((props: PackageDetailsProps) =>
     const { object } = props;
     const [networkPolicies, setNetworkPolicies] = useState<NetworkPolicyInfo[]>([]);
     const [loadingPolicies, setLoadingPolicies] = useState(true);
+    const [policiesFetchError, setPoliciesFetchError] = useState<string | null>(null);
 
     // Fetch NetworkPolicies in the Package's namespace that belong to this Package (via uds/package label)
     useEffect(() => {
+      // Track if component is still mounted to avoid state updates on unmounted component
+      let isMounted = true;
+
       const fetchNetworkPolicies = async () => {
+        // Reset error state on new fetch
+        if (isMounted) {
+          setPoliciesFetchError(null);
+          setLoadingPolicies(true);
+        }
+
         try {
-          const namespace = object.getNs();
+          const namespace = object.getNs() ?? "default";
           const packageName = object.getName();
 
           // Use the apiManager to get or create a NetworkPolicy API instance
@@ -54,25 +64,40 @@ export const PackageDetails = observer((props: PackageDetailsProps) =>
           const labelSelector = `uds/package=${packageName}`;
           const allPolicies = await networkPolicyApi.list({ namespace }, { labelSelector });
 
-          if (allPolicies) {
+          if (isMounted && allPolicies) {
             setNetworkPolicies(
-              allPolicies.map((p: any) => ({
+              allPolicies.map((p: Renderer.K8sApi.KubeObject): NetworkPolicyInfo => {
                 // KubeObject uses getName() and getNs() methods
-                name: typeof p.getName === "function" ? p.getName() : p.metadata?.name || "",
-                namespace: typeof p.getNs === "function" ? p.getNs() : p.metadata?.namespace || namespace,
-              })),
+                const policyName = typeof p.getName === "function" ? p.getName() : p.metadata?.name || "";
+                const policyNs = typeof p.getNs === "function" ? p.getNs() : p.metadata?.namespace;
+                return {
+                  name: policyName,
+                  namespace: policyNs ?? namespace,
+                };
+              }),
             );
           }
         } catch (error) {
-          // If we can't fetch policies, we'll just show the count from status
-          console.warn("Could not fetch NetworkPolicies:", error);
+          // Log error and set error state for user feedback
+          const errorMessage = error instanceof Error ? error.message : String(error);
+          Common.logger.warn(`[PackageDetails] Could not fetch NetworkPolicies: ${errorMessage}`);
+          if (isMounted) {
+            setPoliciesFetchError(errorMessage);
+          }
         } finally {
-          setLoadingPolicies(false);
+          if (isMounted) {
+            setLoadingPolicies(false);
+          }
         }
       };
 
       fetchNetworkPolicies();
-    }, [object]);
+
+      // Cleanup function to prevent state updates on unmounted component
+      return () => {
+        isMounted = false;
+      };
+    }, [object.metadata?.uid]); // Use UID for more specific dependency tracking
 
     const renderSelector = (selector?: { [key: string]: string }) => {
       if (!selector || Object.keys(selector).length === 0) return "None";
@@ -208,6 +233,16 @@ export const PackageDetails = observer((props: PackageDetailsProps) =>
 
       if (loadingPolicies) {
         return <div className={styles.empty}>Loading network policies...</div>;
+      }
+
+      if (policiesFetchError) {
+        return (
+          <div className={styles.empty}>
+            {policyCount > 0
+              ? `${policyCount} network policies created (could not load details: ${policiesFetchError})`
+              : `Failed to load network policies: ${policiesFetchError}`}
+          </div>
+        );
       }
 
       if (networkPolicies.length === 0) {

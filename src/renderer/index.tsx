@@ -60,7 +60,7 @@ export default class UDSRenderer extends Renderer.LensExtension {
       apiVersions: Package.crd.apiVersions,
       priority: 10,
       components: {
-        Details: (props: Renderer.Component.KubeObjectDetailsProps<any>) => (
+        Details: (props: Renderer.Component.KubeObjectDetailsProps<Package>) => (
           <PackageDetails {...props} extension={this} />
         ),
       },
@@ -70,7 +70,7 @@ export default class UDSRenderer extends Renderer.LensExtension {
       apiVersions: ClusterConfig.crd.apiVersions,
       priority: 10,
       components: {
-        Details: (props: Renderer.Component.KubeObjectDetailsProps<any>) => (
+        Details: (props: Renderer.Component.KubeObjectDetailsProps<ClusterConfig>) => (
           <ClusterConfigDetails {...props} extension={this} />
         ),
       },
@@ -80,7 +80,7 @@ export default class UDSRenderer extends Renderer.LensExtension {
       apiVersions: Exemption.crd.apiVersions,
       priority: 10,
       components: {
-        Details: (props: Renderer.Component.KubeObjectDetailsProps<any>) => (
+        Details: (props: Renderer.Component.KubeObjectDetailsProps<Exemption>) => (
           <ExemptionDetails {...props} extension={this} />
         ),
       },
@@ -111,7 +111,7 @@ export default class UDSRenderer extends Renderer.LensExtension {
   clusterPageMenus = [
     {
       id: "uds-management",
-      title: "UDS Management",
+      title: "UDS",
       components: {
         Icon: UDSManagementIcon,
       },

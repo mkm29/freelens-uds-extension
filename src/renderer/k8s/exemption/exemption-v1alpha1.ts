@@ -60,7 +60,7 @@ export class Exemption extends Renderer.K8sApi.LensExtensionKubeObject<
     plural: "exemptions",
     singular: "exemption",
     shortNames: ["exempt"],
-    title: "UDS Exemptions",
+    title: "Exemptions",
   };
 
   // Exemption Helper Methods
