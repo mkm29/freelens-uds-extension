@@ -17,12 +17,12 @@ directly within Freelens.
 
 ### Unified Navigation
 
-All UDS resources are organized under a single **"UDS Management"** menu in the
+All UDS resources are organized under a single **"UDS"** menu in the
 cluster sidebar, providing quick access to:
 
-- UDS Packages
-- UDS Cluster Configs
-- UDS Exemptions
+- Packages
+- Cluster Configs
+- Exemptions
 
 ### UDS Package Support
 
@@ -167,7 +167,7 @@ The tarball for the extension will be placed in the current directory. In
 Freelens, navigate to the Extensions list and provide the path to the tarball
 to be loaded, or drag and drop the extension tarball into the Freelens window.
 After loading for a moment, the extension should appear in the list of enabled
-extensions and a "UDS Management" menu will appear in the cluster sidebar with
+extensions and a "UDS" menu will appear in the cluster sidebar with
 sub-items for Packages, Cluster Configs, and Exemptions.
 
 ### Check code statically
