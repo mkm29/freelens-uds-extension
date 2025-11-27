@@ -39,15 +39,15 @@ export class ClusterConfig extends Renderer.K8sApi.LensExtensionKubeObject<
   ClusterConfigStatus,
   ClusterConfigSpec
 > {
-  static readonly kind = "UDSClusterConfig";
+  static readonly kind = "ClusterConfig";
   static readonly namespaced = false;
-  static readonly apiBase = "/apis/uds.dev/v1alpha1/udsclusterconfigs";
+  static readonly apiBase = "/apis/uds.dev/v1alpha1/clusterconfig";
 
   static readonly crd: ClusterConfigKubeObjectCRD = {
     apiVersions: ["uds.dev/v1alpha1"],
-    plural: "udsclusterconfigs",
-    singular: "udsclusterconfig",
-    shortNames: ["ucc"],
+    plural: "clusterconfig",
+    singular: "clusterconfig",
+    shortNames: ["cc"],
     title: "UDS Cluster Configs",
   };
 
