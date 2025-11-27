@@ -1,41 +1,56 @@
 import { Renderer } from "@freelensapp/extensions";
 import { observer } from "mobx-react";
 import { withErrorPage } from "../components/error-page";
-import { Example, type ExampleApi } from "../k8s/example/example-v1alpha1";
-import styles from "./examples-page.module.scss";
-import stylesInline from "./examples-page.module.scss?inline";
+import { Exemption, type ExemptionApi } from "../k8s/exemption/exemption-v1alpha1";
+import styles from "./exemptions-page.module.scss";
+import stylesInline from "./exemptions-page.module.scss?inline";
 
 const {
-  Component: { BadgeBoolean, KubeObjectAge, KubeObjectListLayout, LinkToNamespace, WithTooltip },
+  Component: { Badge, KubeObjectAge, KubeObjectListLayout, LinkToNamespace, WithTooltip },
 } = Renderer;
 
-const KubeObject = Example;
-type KubeObject = Example;
-type KubeObjectApi = ExampleApi;
+const KubeObject = Exemption;
+type KubeObject = Exemption;
+type KubeObjectApi = ExemptionApi;
 
 const sortingCallbacks = {
   name: (object: KubeObject) => object.getName(),
   namespace: (object: KubeObject) => object.getNs(),
-  active: (object: KubeObject) => String(KubeObject.getActive(object)),
-  title: (object: KubeObject) => KubeObject.getTitle(object),
+  exemptions: (object: KubeObject) => KubeObject.getExemptionCount(object),
+  policies: (object: KubeObject) => KubeObject.getPolicyCount(object),
+  phase: (object: KubeObject) => KubeObject.getPhase(object),
   age: (object: KubeObject) => object.getCreationTimestamp(),
 };
 
 const renderTableHeader: { title: string; sortBy: keyof typeof sortingCallbacks; className?: string }[] = [
   { title: "Name", sortBy: "name" },
   { title: "Namespace", sortBy: "namespace" },
-  { title: "Active", sortBy: "active", className: styles.active },
-  { title: "Title", sortBy: "title", className: styles.title },
+  { title: "Exemptions", sortBy: "exemptions", className: styles.count },
+  { title: "Policies", sortBy: "policies", className: styles.count },
+  { title: "Phase", sortBy: "phase", className: styles.phase },
   { title: "Age", sortBy: "age", className: styles.age },
 ];
 
-export interface ExamplesPageProps {
+export interface ExemptionsPageProps {
   extension: Renderer.LensExtension;
 }
 
-export const ExamplesPage = observer((props: ExamplesPageProps) =>
+export const ExemptionsPage = observer((props: ExemptionsPageProps) =>
   withErrorPage(props, () => {
     const store = KubeObject.getStore<KubeObject>();
+
+    const getPhaseColor = (phase: string): string => {
+      switch (phase.toLowerCase()) {
+        case "ready":
+          return "success";
+        case "pending":
+          return "warning";
+        case "failed":
+          return "error";
+        default:
+          return "default";
+      }
+    };
 
     return (
       <>
@@ -51,8 +66,9 @@ export const ExamplesPage = observer((props: ExamplesPageProps) =>
           renderTableContents={(object: KubeObject) => [
             <WithTooltip>{object.getName()}</WithTooltip>,
             <LinkToNamespace namespace={object.getNs()} />,
-            <BadgeBoolean value={KubeObject.getActive(object)} />,
-            <WithTooltip>{KubeObject.getTitle(object) ?? "N/A"}</WithTooltip>,
+            <Badge label={String(KubeObject.getExemptionCount(object))} />,
+            <Badge label={String(KubeObject.getPolicyCount(object))} />,
+            <Badge label={KubeObject.getPhase(object)} className={getPhaseColor(KubeObject.getPhase(object))} />,
             <KubeObjectAge object={object} key="age" />,
           ]}
         />

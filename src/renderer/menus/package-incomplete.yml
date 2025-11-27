@@ -1,0 +1,28 @@
+apiVersion: uds.dev/v1alpha1
+kind: Package
+metadata:
+  name: authservice
+  namespace: authservice
+spec:
+  network:
+    allow:
+      - direction: Ingress
+        remoteGenerated: IntraNamespace
+      - direction: Egress
+        remoteGenerated: IntraNamespace
+      - description: SSO Provider
+        direction: Egress
+        remoteNamespace: istio-tenant-gateway
+        remoteSelector:
+          app: tenant-ingressgateway
+      - description: Redis Session Store
+        direction: Egress
+        remoteGenerated: Anywhere
+      - description: Protected Apps
+        direction: Ingress
+        port: 10003
+        remoteNamespace:
+        selector:
+          app.kubernetes.io/name: authservice
+    serviceMesh:
+      mode: ambient

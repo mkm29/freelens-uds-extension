@@ -10,8 +10,8 @@
 
 A Freelens extension for managing [Defense Unicorns](https://defenseunicorns.com/)
 UDS (Unicorn Delivery Service) Custom Resources. This extension provides UI
-support for viewing and managing UDS Package and ClusterConfig CRs directly
-within Freelens.
+support for viewing and managing UDS Package, ClusterConfig, and Exemption CRs
+directly within Freelens.
 
 ## Features
 
@@ -35,6 +35,17 @@ within Freelens.
   - Networking (Kube API CIDR, node CIDRs)
   - Policy (namespace exemption settings)
 
+### UDS Exemption Support
+
+- **Exemption List View**: View all UDS Exemption CRs across namespaces with
+  policy counts and namespace information
+- **Exemption Details Panel**: Detailed view of policy exemption configurations:
+  - Exemption matchers (pod/service name patterns, namespaces)
+  - Exempted policies list
+  - Title and description for each exemption
+- **Context Menu Actions**: Copy YAML manifest with labels/annotations, copy
+  policy names
+
 ## Requirements
 
 - Kubernetes >= 1.29
@@ -46,6 +57,7 @@ within Freelens.
 
 - `uds.dev/v1alpha1` - UDS Package Custom Resource
 - `uds.dev/v1alpha1` - UDS ClusterConfig Custom Resource
+- `uds.dev/v1alpha1` - UDS Exemption Custom Resource
 
 ## Quick Start
 
@@ -57,6 +69,9 @@ kubectl apply -f examples/uds-package/crds/customresourcedefinition.yaml
 
 # Install ClusterConfig CRD
 kubectl apply -f examples/uds-clusterconfig/crds/customresourcedefinition.yaml
+
+# Install Exemption CRD
+kubectl apply -f examples/uds-exemption/crds/customresourcedefinition.yaml
 ```
 
 ### Create sample resources
@@ -67,11 +82,15 @@ kubectl apply -f examples/uds-package/test/example.yaml
 
 # Create sample ClusterConfig resource
 kubectl apply -f examples/uds-clusterconfig/test/example.yaml
+
+# Create sample Exemption resource
+kubectl apply -f examples/uds-exemption/test/example.yaml
 ```
 
 This creates example Package CRs for Grafana, NeuVector, and Loki demonstrating
 SSO, network policies, and monitoring configurations. It also creates an example
-ClusterConfig CR demonstrating cluster-level UDS configuration.
+ClusterConfig CR demonstrating cluster-level UDS configuration, and an example
+Exemption CR demonstrating policy exemptions for Istio components.
 
 ## Install
 
@@ -137,8 +156,8 @@ The tarball for the extension will be placed in the current directory. In
 Freelens, navigate to the Extensions list and provide the path to the tarball
 to be loaded, or drag and drop the extension tarball into the Freelens window.
 After loading for a moment, the extension should appear in the list of enabled
-extensions and "UDS Packages" and "UDS Cluster Configs" will appear in the
-cluster sidebar.
+extensions and "UDS Packages", "UDS Cluster Configs", and "UDS Exemptions" will
+appear in the cluster sidebar.
 
 ### Check code statically
 
@@ -269,11 +288,60 @@ spec:
     allowAllNsExemptions: false
 ```
 
+## UDS Exemption CR Structure
+
+The UDS Exemption CR defines policy exemptions for specific workloads that need
+to bypass certain Pepr policies. Exemptions are typically created in the
+`uds-policy-exemptions` namespace.
+
+### Exemptions
+
+Define exemptions with matchers and policies:
+
+```yaml
+spec:
+  exemptions:
+    - title: Istio CNI exemptions
+      description: Exemptions necessary for Istio CNI to manage network configurations
+      matcher:
+        kind: pod
+        name: istio-cni-node.*
+        namespace: istio-system
+      policies:
+        - RequireNonRootUser
+        - RestrictVolumeTypes
+        - DisallowHostNamespaces
+        - RestrictCapabilities
+```
+
+### Matcher Options
+
+The matcher field supports:
+
+- `kind`: Resource kind (`pod` or `service`)
+- `name`: Resource name pattern (supports regex, e.g., `istio-cni-node.*`)
+- `namespace`: Target namespace for the exemption
+
+### Available Policies
+
+Common policies that can be exempted:
+
+- `DisallowPrivileged` - Disallow privileged containers
+- `RequireNonRootUser` - Require non-root user
+- `DropAllCapabilities` - Drop all Linux capabilities
+- `RestrictVolumeTypes` - Restrict volume types
+- `RestrictCapabilities` - Restrict Linux capabilities
+- `DisallowHostNamespaces` - Disallow host namespaces
+- `RestrictHostPathWrite` - Restrict hostPath write access
+- `RestrictHostPorts` - Restrict host port usage
+- `RestrictSELinuxType` - Restrict SELinux types
+
 ## Related Resources
 
 - [UDS Documentation](https://uds.defenseunicorns.com/)
 - [UDS Package CR Reference](https://uds.defenseunicorns.com/reference/configuration/custom-resources/packages-v1alpha1-cr/)
 - [UDS ClusterConfig CR Reference](https://uds.defenseunicorns.com/reference/configuration/custom-resources/clusterconfig-v1alpha1-cr/)
+- [UDS Exemption CR Reference](https://uds.defenseunicorns.com/reference/configuration/custom-resources/exemptions-v1alpha1-cr/)
 - [Freelens](https://freelens.app/)
 - [Freelens Extensions Wiki](https://github.com/freelensapp/freelens/wiki/Extensions)
 

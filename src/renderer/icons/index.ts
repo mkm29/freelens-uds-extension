@@ -1,3 +1,3 @@
 export * from "./clusterconfig";
-export * from "./example";
+export * from "./exemption";
 export * from "./package";

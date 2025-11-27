@@ -1,91 +1,85 @@
+# Copyright 2025 Defense Unicorns
+# SPDX-License-Identifier: AGPL-3.0-or-later OR LicenseRef-Defense-Unicorns-Commercial
+
 apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
-  name: udsclusterconfigs.uds.dev
+  name: clusterconfig.uds.dev
 spec:
+  conversion:
+    strategy: None
   group: uds.dev
   names:
-    kind: UDSClusterConfig
-    listKind: UDSClusterConfigList
-    plural: udsclusterconfigs
-    singular: udsclusterconfig
-    shortNames:
-      - ucc
+    kind: ClusterConfig
+    listKind: ClusterConfigList
+    plural: clusterconfig
+    singular: clusterconfig
   scope: Cluster
   versions:
     - name: v1alpha1
-      served: true
-      storage: true
       schema:
         openAPIV3Schema:
-          type: object
           properties:
-            spec:
+            metadata:
+              properties:
+                name:
+                  enum:
+                    - uds-cluster-config
+                  type: string
               type: object
+            spec:
               properties:
                 attributes:
-                  type: object
-                  description: Cluster attributes for identification and categorization
                   properties:
                     clusterName:
+                      description: Friendly name to associate with your UDS cluster
                       type: string
-                      description: A descriptive identifier for your UDS cluster
                     tags:
-                      type: array
-                      description: Labels to categorize your cluster
+                      description: Tags to apply to your UDS cluster
                       items:
                         type: string
+                      type: array
+                  type: object
                 expose:
-                  type: object
-                  description: Configuration for service exposure
                   properties:
-                    domain:
-                      type: string
-                      description: Primary domain for service exposure
                     adminDomain:
+                      description: Domain all cluster services on the admin gateway will be exposed on
                       type: string
-                      description: Separate domain for admin gateway services
                     caCert:
+                      description: The trusted CA that signed your domain certificates if using Private PKI
                       type: string
-                      description: Root certificate authority certificate when using private PKI
-                networking:
+                    domain:
+                      description: Domain all cluster services will be exposed on
+                      type: string
+                  required:
+                    - domain
                   type: object
-                  description: Network configuration for the cluster
+                networking:
                   properties:
                     kubeApiCIDR:
+                      description: CIDR range for your Kubernetes control plane nodes. This is a manual override that can be used instead of relying on Pepr to automatically watch and update the values
                       type: string
-                      description: CIDR range for Kubernetes control plane nodes (manual override)
                     kubeNodeCIDRs:
-                      type: array
-                      description: CIDR ranges for all cluster nodes (manual override)
+                      description: CIDR(s) for all Kubernetes nodes (not just control plane). Similar reason to above,annual override instead of relying on watch
                       items:
                         type: string
-                policy:
+                      type: array
                   type: object
-                  description: Policy configuration for UDS
+                policy:
                   properties:
                     allowAllNsExemptions:
+                      default: false
+                      description: Allow UDS Exemption custom resources to live in any namespace (default false)
                       type: boolean
-                      description: Permits UDS Exemption resources across any namespace (defaults to false)
-            status:
+                  required:
+                    - allowAllNsExemptions
+                  type: object
+              required:
+                - expose
+                - policy
               type: object
-              properties:
-                observedGeneration:
-                  type: integer
-                phase:
-                  type: string
-      subresources:
-        status: {}
-      additionalPrinterColumns:
-        - name: Cluster Name
-          type: string
-          jsonPath: .spec.attributes.clusterName
-        - name: Domain
-          type: string
-          jsonPath: .spec.expose.domain
-        - name: Phase
-          type: string
-          jsonPath: .status.phase
-        - name: Age
-          type: date
-          jsonPath: .metadata.creationTimestamp
+          required:
+            - spec
+          type: object
+      served: true
+      storage: true

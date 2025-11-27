@@ -1,0 +1,41 @@
+apiVersion: uds.dev/v1alpha1
+kind: Package
+metadata:
+  annotations:
+    meta.helm.sh/release-name: authservice
+    meta.helm.sh/release-namespace: authservice
+    uds-core.pepr.dev/uds-core-operator: succeeded
+  creationTimestamp: "2025-11-25T14:45:00Z"
+  finalizers:
+    - pepr.dev/finalizer
+  generation: 1
+  labels:
+    app.kubernetes.io/managed-by: Helm
+    zarf.dev/package: core-identity-authorization
+  name: authservice
+  namespace: authservice
+  resourceVersion: "38830"
+  uid: 0f95b07e-75c6-4c8b-97fc-ac27cad3dc3f
+spec:
+  network:
+    allow:
+      - direction: Ingress
+        remoteGenerated: IntraNamespace
+      - direction: Egress
+        remoteGenerated: IntraNamespace
+      - description: SSO Provider
+        direction: Egress
+        remoteNamespace: istio-tenant-gateway
+        remoteSelector:
+          app: tenant-ingressgateway
+      - description: Redis Session Store
+        direction: Egress
+        remoteGenerated: Anywhere
+      - description: Protected Apps
+        direction: Ingress
+        port: 10003
+        remoteNamespace: ""
+        selector:
+          app.kubernetes.io/name: authservice
+    serviceMesh:
+      mode: ambient
