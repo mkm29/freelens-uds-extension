@@ -226,7 +226,7 @@ export const ClusterConfigMenuItem = (props: UDSMenuItemProps<ClusterConfig>) =>
     event.stopPropagation();
     const manifest = {
       apiVersion: "uds.dev/v1alpha1",
-      kind: "UDSClusterConfig",
+      kind: "ClusterConfig",
       metadata: buildMetadata(object, false),
       spec: object.spec,
     };
