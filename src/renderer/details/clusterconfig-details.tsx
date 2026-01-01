@@ -94,6 +94,39 @@ export const ClusterConfigDetails = observer((props: ClusterConfigDetailsProps) 
       );
     };
 
+    const renderCaBundle = () => {
+      const caBundle = object.spec?.caBundle;
+      if (
+        !caBundle ||
+        (!caBundle.certs && caBundle.includeDoDCerts === undefined && caBundle.includePublicCerts === undefined)
+      ) {
+        return <div className={styles.empty}>No CA bundle configuration</div>;
+      }
+
+      return (
+        <div className={styles.configItem}>
+          <div className={styles.configDetails}>
+            {caBundle.includeDoDCerts !== undefined && (
+              <div>
+                Include DoD Certs: <Badge label={caBundle.includeDoDCerts ? "Yes" : "No"} />
+              </div>
+            )}
+            {caBundle.includePublicCerts !== undefined && (
+              <div>
+                Include Public Certs: <Badge label={caBundle.includePublicCerts ? "Yes" : "No"} />
+              </div>
+            )}
+            {caBundle.certs && (
+              <div>
+                Custom CA Certificates: <Badge label="Configured" />
+                <div className={styles.caCert}>{caBundle.certs}</div>
+              </div>
+            )}
+          </div>
+        </div>
+      );
+    };
+
     const renderPolicy = () => {
       const policy = object.spec?.policy;
       if (!policy || policy.allowAllNsExemptions === undefined) {
@@ -115,15 +148,12 @@ export const ClusterConfigDetails = observer((props: ClusterConfigDetailsProps) 
       <>
         <style>{stylesInline}</style>
         <DrawerItem name="API Version">uds.dev/v1alpha1</DrawerItem>
-        <DrawerItem name="Phase">
-          <Badge label={object.status?.phase || "Unknown"} />
-        </DrawerItem>
-        {object.status?.observedGeneration && (
-          <DrawerItem name="Observed Generation">{object.status.observedGeneration}</DrawerItem>
-        )}
 
         <SubTitle title="Attributes" />
         <div className={styles.section}>{renderAttributes()}</div>
+
+        <SubTitle title="CA Bundle" />
+        <div className={styles.section}>{renderCaBundle()}</div>
 
         <SubTitle title="Expose" />
         <div className={styles.section}>{renderExpose()}</div>

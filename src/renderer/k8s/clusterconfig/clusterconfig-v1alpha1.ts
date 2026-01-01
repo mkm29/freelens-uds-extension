@@ -22,16 +22,22 @@ export interface ClusterConfigPolicy {
   allowAllNsExemptions?: boolean;
 }
 
+export interface ClusterConfigCaBundle {
+  certs?: string;
+  includeDoDCerts?: boolean;
+  includePublicCerts?: boolean;
+}
+
 export interface ClusterConfigSpec {
   attributes?: ClusterConfigAttributes;
+  caBundle?: ClusterConfigCaBundle;
   expose?: ClusterConfigExpose;
   networking?: ClusterConfigNetworking;
   policy?: ClusterConfigPolicy;
 }
 
 export interface ClusterConfigStatus {
-  observedGeneration?: number;
-  phase?: string;
+  // ClusterConfig v1alpha1 does not define status fields
 }
 
 export class ClusterConfig extends Renderer.K8sApi.LensExtensionKubeObject<
@@ -53,7 +59,7 @@ export class ClusterConfig extends Renderer.K8sApi.LensExtensionKubeObject<
 
   // Attributes Helper Methods
   static getClusterName(object: ClusterConfig): string {
-    return object.spec?.attributes?.clusterName ?? "Unknown";
+    return object.spec?.attributes?.clusterName ?? "";
   }
 
   static getTags(object: ClusterConfig): string[] {
@@ -63,6 +69,24 @@ export class ClusterConfig extends Renderer.K8sApi.LensExtensionKubeObject<
   static hasAttributes(object: ClusterConfig): boolean {
     const attrs = object.spec?.attributes;
     return !!(attrs?.clusterName || (attrs?.tags && attrs.tags.length > 0));
+  }
+
+  // CaBundle Helper Methods
+  static getCerts(object: ClusterConfig): string {
+    return object.spec?.caBundle?.certs ?? "";
+  }
+
+  static getIncludeDoDCerts(object: ClusterConfig): boolean {
+    return object.spec?.caBundle?.includeDoDCerts ?? false;
+  }
+
+  static getIncludePublicCerts(object: ClusterConfig): boolean {
+    return object.spec?.caBundle?.includePublicCerts ?? false;
+  }
+
+  static hasCaBundle(object: ClusterConfig): boolean {
+    const caBundle = object.spec?.caBundle;
+    return !!(caBundle?.certs || caBundle?.includeDoDCerts !== undefined || caBundle?.includePublicCerts !== undefined);
   }
 
   // Expose Helper Methods
@@ -104,15 +128,6 @@ export class ClusterConfig extends Renderer.K8sApi.LensExtensionKubeObject<
 
   static hasPolicy(object: ClusterConfig): boolean {
     return object.spec?.policy?.allowAllNsExemptions !== undefined;
-  }
-
-  // Status Helper Methods
-  static getPhase(object: ClusterConfig): string {
-    return object.status?.phase ?? "Unknown";
-  }
-
-  static isReady(object: ClusterConfig): boolean {
-    return object.status?.phase === "Ready";
   }
 }
 
